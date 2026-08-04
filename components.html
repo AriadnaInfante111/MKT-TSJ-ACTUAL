@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style Guide - iSAGI Shop and bulk</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .component-section {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        .component-label {
+            color: var(--secondary-text);
+            margin-bottom: 20px;
+            display: block;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+        }
+        .gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .type-item {
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
+        }
+        .type-meta {
+            min-width: 150px;
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <span>iSAGI</span> SHOP AND BULK
+            </a>
+            <h4>Style Guide & Components</h4>
+            <a href="index.html" class="add-btn" style="text-decoration: none; padding: 10px 20px;">Volver a la Tienda</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Typography Section -->
+        <section class="component-section">
+            <span class="component-label">Tipografía y Escala</span>
+            <div class="gallery">
+                <div class="type-item">
+                    <span class="type-meta">H1 - Poppins - 49px</span>
+                    <h1>El Bienestar Comienza Aquí</h1>
+                </div>
+                <div class="type-item">
+                    <span class="type-meta">H2 - Poppins - 39px</span>
+                    <h2>Cuidado para toda la familia</h2>
+                </div>
+                <div class="type-item">
+                    <span class="type-meta">H3 - Poppins - 31px</span>
+                    <h3>Especialistas en Salud</h3>
+                </div>
+                <div class="type-item">
+                    <span class="type-meta">H4 - Inter - 25px</span>
+                    <h4>Promociones Exclusivas</h4>
+                </div>
+                <div class="type-item">
+                    <span class="type-meta">H5 - Inter - 20px</span>
+                    <h5>Categorías Destacadas</h5>
+                </div>
+                <div class="type-item">
+                    <span class="type-meta">H6 - Inter - 16px</span>
+                    <h6>Paracetamol 500mg Tabletas</h6>
+                </div>
+                <div class="type-item">
+                    <span class="type-meta">Body - Inter - 16px</span>
+                    <p>Este es el texto base utilizado para descripciones de productos y contenido informativo general.</p>
+                </div>
+                <div class="type-item">
+                    <span class="type-meta">Label - Inter - 14px</span>
+                    <span class="label-small">Vence: 12/2026</span>
+                </div>
+                <div class="type-item">
+                    <span class="type-meta">X-Small - Inter - 12px</span>
+                    <span class="label-extra-small">Lote: PH99201</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Colors Section -->
+        <section class="component-section">
+            <span class="component-label">Paleta de Colores</span>
+            <div style="display: flex; gap: 20px;">
+                <div style="text-align: center;">
+                    <div style="width: 100px; height: 100px; background: var(--primary); border-radius: 12px; margin-bottom: 10px;"></div>
+                    <span class="label-small">Apollo Yellow<br>#FFC635</span>
+                </div>
+                <div style="text-align: center;">
+                    <div style="width: 100px; height: 100px; background: var(--primary-text); border-radius: 12px; margin-bottom: 10px;"></div>
+                    <span class="label-small">Primary Text<br>#333333</span>
+                </div>
+                <div style="text-align: center;">
+                    <div style="width: 100px; height: 100px; background: var(--secondary-text); border-radius: 12px; margin-bottom: 10px;"></div>
+                    <span class="label-small">Secondary<br>#666666</span>
+                </div>
+                <div style="text-align: center;">
+                    <div style="width: 100px; height: 100px; background: var(--medium-gray); border-radius: 12px; margin-bottom: 10px;"></div>
+                    <span class="label-small">Border<br>#E0E0E0</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Components Section -->
+        <section class="component-section">
+            <span class="component-label">Botones e Interacción</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <span class="label-extra-small">SOLID</span>
+                    <button class="add-btn btn-primary">Primario (Apollo)</button>
+                    <button class="add-btn">Secundario (80% Black)</button>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <span class="label-extra-small">OUTLINED</span>
+                    <button class="add-btn btn-outline-primary">Outline Primario</button>
+                    <button class="add-btn btn-outline-secondary">Outline Secundario</button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <span class="label-extra-small">QUANTITY & ICONS</span>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div class="qty-selector">
+                            <button class="qty-btn">-</button>
+                            <input type="number" value="1" class="qty-input">
+                            <button class="qty-btn">+</button>
+                        </div>
+                        <button class="icon-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <span class="label-extra-small">DISABLED STATE</span>
+                    <button class="add-btn disabled">Finalizar Compra (Disabled)</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Banners Section -->
+        <section class="component-section">
+            <span class="component-label">Banners e Información</span>
+            <div style="margin-bottom: 20px;">
+                <span class="label-extra-small">TOP OFFER BANNER</span>
+                <div class="offer-banner" style="margin-top: 10px;">
+                    <div class="offer-banner-content">
+                        <div class="offer-banner-left">
+                            <span class="offer-banner-title">CyberWow</span>
+                            <span class="offer-banner-desc">¡Hasta 50% de descuento! Solo por hoy.</span>
+                        </div>
+                        <button class="offer-banner-btn">VER PRODUCTOS</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="component-section">
+            <span class="component-label">Cards & Promos</span>
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px;">
+                <div>
+                    <span class="label-extra-small">PRODUCT CARD PREVIEW</span>
+                    <article class="product-card">
+                        <div class="card-image-wrapper">
+                            <img src="./assets/product.png" alt="Preview">
+                            <button class="favorite-btn active">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                            </button>
+                            <span class="card-tag">Día de la Madre</span>
+                        </div>
+                        <div class="card-info">
+                             <span class="card-articulo" style="background-color: #FFC635;">7015</span>
+                             <a href="#" class="card-name-link">
+                                <h6 class="card-name">Toalla Belleza 150 × 75 - Blanco</h6>
+                                <span class="card-brand">San Jacinto</span>
+                             </a>
+                             <div class="card-price">S/ 15.97</div>
+                             <div class="card-meta">Pack: 12 | Color: 982004</div>
+                        </div>
+                    </article>
+                </div>
+
+                <div>
+                    <span class="label-extra-small">MEGA MENU PROMO CARD</span>
+                    <div class="mega-promo-card" style="opacity: 1; visibility: visible; border: 1px solid var(--medium-gray);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div class="mega-promo-name">CyberWow</div>
+                            <span class="label-extra-small" style="background: var(--white); padding: 2px 8px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">8 productos</span>
+                        </div>
+                        <div class="mega-promo-desc">Descuentos increíbles en salud y bienestar solo por esta semana.</div>
+                        <div class="mega-promo-date">Válido del 20 al 25 de abril</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

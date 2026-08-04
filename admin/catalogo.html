@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Técnico de Productos - iSAGI Shop and bulk</title>
+    <meta name="description" content="Consulta nuestro catálogo detallado de productos con especificaciones técnicas.">
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .catalog-container {
+            padding: 40px 0;
+        }
+        .catalog-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid var(--color-primary-100);
+            padding-bottom: 20px;
+        }
+        .catalog-table-wrapper {
+            background: var(--white);
+            border-radius: var(--radius-card);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid var(--medium-gray);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th {
+            background: var(--color-primary-50);
+            color: var(--color-primary-900);
+            text-align: left;
+            padding: 15px 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+        }
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--light-gray);
+            vertical-align: middle;
+        }
+        tr:hover td {
+            background: var(--color-primary-50);
+        }
+        .prod-img-mini {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: var(--light-gray);
+        }
+        .badge-linea {
+            background: var(--color-primary-100);
+            color: var(--color-primary-700);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .price-tag {
+            font-weight: 700;
+            color: var(--primary-text);
+        }
+        .cost-tag {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+        }
+        .color-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+            border: 1px solid var(--medium-gray);
+        }
+    </style>
+</head>
+<body>
+    <!-- Dynamic Header -->
+    <div id="mainHeader"></div>
+
+    <!-- Cart Drawer -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>Tu Carrito</h3>
+            <button class="icon-button" id="closeCart" data-tooltip="Cerrar carrito">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="cart-body" id="cartBody"></div>
+        <div class="cart-footer" id="cartFooter">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotalText">S/ 0.00</span>
+            </div>
+            <div class="cart-footer-actions">
+                <a href="checkout.html" id="checkoutBtn" class="add-btn btn-primary" style="text-decoration: none;" data-tooltip="Finalizar compra">Finalizar Compra</a>
+                <button id="clearCartBtn" class="clear-cart-btn-icon" data-tooltip="Vaciar carrito">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container catalog-container">
+        <div class="catalog-header">
+            <div>
+                <h1>Catálogo Técnico</h1>
+                <p class="grayscale-60">Listado detallado de especificaciones y costos por artículo.</p>
+            </div>
+            <div class="search-bar" style="max-width: 300px;">
+                <input type="text" id="catalogSearch" placeholder="Filtrar catálogo...">
+            </div>
+        </div>
+
+        <div class="catalog-table-wrapper">
+            <table id="catalogTable">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Código</th>
+                        <th>Fabricante / Línea</th>
+                        <th>Dimensiones</th>
+                        <th>Pack</th>
+                        <th>Colores</th>
+                        <th>Costo Unit.</th>
+                        <th>Precio Venta</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="catalogBody">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { products } from '../data.js';
+        import { fixPath } from '../app.js';
+
+        function renderCatalog(filter = '') {
+            const body = document.getElementById('catalogBody');
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(filter.toLowerCase()) || 
+                p.codigo_articulo.toLowerCase().includes(filter.toLowerCase()) ||
+                p.fabricante.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            body.innerHTML = filtered.map(p => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <img src="${fixPath(p.image)}" class="prod-img-mini">
+                            <div style="font-weight: 600;">${p.name}</div>
+                        </div>
+                    </td>
+                    <td><code style="background: #f0f4f8; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">${p.codigo_articulo}</code></td>
+                    <td>
+                        <div style="font-size: 0.8rem; font-weight: 600;">${p.fabricante}</div>
+                        <div class="badge-linea">${p.linea}</div>
+                    </td>
+                    <td>${p.dimensiones}</td>
+                    <td>${p.pack}</td>
+                    <td>
+                        ${p.colores.map(c => `
+                            <div style="display: flex; align-items: center; font-size: 0.75rem; margin-bottom: 2px;">
+                                <span class="color-dot" style="background-color: ${getColorHex(c)}"></span>
+                                ${c}
+                            </div>
+                        `).join('')}
+                    </td>
+                    <td class="cost-tag">S/ ${p.costo_unitario.toFixed(2)}</td>
+                    <td class="price-tag">S/ ${p.price.toFixed(2)}</td>
+                    <td>
+                        <button class="add-btn btn-primary" data-id="${p.id}" style="padding: 6px 12px; font-size: 0.8rem;">
+                            Agregar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getColorHex(name) {
+            const colors = {
+                'Blanco': '#ffffff',
+                'Rojo': '#ff4d4f',
+                'Azul': '#3783ff',
+                'Naranja': '#ffa940',
+                'Amarillo': '#ffec3d',
+                'Celeste': '#91d5ff',
+                'Transparente': 'rgba(255,255,255,0.5)'
+            };
+            return colors[name] || '#ccc';
+        }
+
+        document.getElementById('catalogSearch').addEventListener('input', (e) => {
+            renderCatalog(e.target.value);
+        });
+
+        // Initialize
+        renderCatalog();
+    </script>
+    <script type="module" src="../app.js"></script>
+</body>
+</html>

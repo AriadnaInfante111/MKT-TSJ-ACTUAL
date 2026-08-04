@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - iSAGI Shop and bulk</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: var(--white);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .login-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100%;
+        }
+
+        .login-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+        }
+
+        .login-right {
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%), url('assets/login_bg.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 80px;
+            color: var(--primary-text);
+        }
+
+        .login-right h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-text);
+        }
+
+        .login-form-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-logo {
+            font-size: 1.8rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-decoration: none;
+            color: var(--primary-text);
+            display: block;
+        }
+
+        .login-logo span {
+            color: var(--primary);
+        }
+
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px;
+            border-radius: var(--radius-button);
+            border: 1px solid var(--medium-gray);
+            background: var(--white);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .social-btn:hover {
+            background: var(--light-gray);
+            border-color: var(--primary);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--secondary-text);
+            font-size: 0.8rem;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .divider:not(:empty)::before { margin-right: 15px; }
+        .divider:not(:empty)::after { margin-left: 15px; }
+
+        .terms-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+
+        .terms-wrapper input {
+            margin-top: 4px;
+            accent-color: var(--primary);
+        }
+
+        .terms-link {
+            text-decoration: underline;
+            color: var(--primary-text);
+            font-weight: 600;
+        }
+
+        .forgot-pass {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+            text-decoration: none;
+        }
+
+        .forgot-pass:hover {
+            color: var(--primary-text);
+        }
+
+        @media (max-width: 900px) {
+            .login-layout { grid-template-columns: 1fr; }
+            .login-right { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-layout">
+        <div class="login-left">
+            <div class="login-form-container">
+                <a href="#" class="login-logo">TOUCH<span>.</span></a>
+                
+                <h3>¡Bienvenido de nuevo!</h3>
+                <p class="label-small grayscale-60" style="margin-bottom: 30px;">Ingresa a tu cuenta para continuar.</p>
+
+                <div class="social-login">
+                    <button class="social-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-1 .67-2.28 1.07-3.71 1.07-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.67-.35-1.39-.35-2.09s.13-1.42.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        Suscribirse con Google
+                    </button>
+                    <button class="social-btn">
+                        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#ff5722" d="M6 6h16v16H6z"/><path fill="#4caf50" d="M26 6h16v16H26z"/><path fill="#03a9f4" d="M6 26h16v16H6z"/><path fill="#ffc107" d="M26 26h16v16H26z"/></svg>
+                        Suscribirse con Gmail de Google
+                    </button>
+                </div>
+
+                <div class="divider">o usa tu Correo Corporativo</div>
+
+                <form id="loginForm">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <input type="email" id="loginEmail" placeholder="Correo Corporativo" style="width: 100%; border: 1px solid var(--medium-gray); padding: 14px; border-radius: var(--radius-button); font-family: inherit; outline: none;" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px; position: relative;">
+                        <input type="password" id="loginPass" placeholder="Contraseña" style="width: 100%; border: 1px solid var(--medium-gray); padding: 14px; border-radius: var(--radius-button); font-family: inherit; outline: none;" required>
+                        <button type="button" id="togglePass" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--secondary-text);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="terms-wrapper">
+                        <input type="checkbox" id="termsCheck" required>
+                        <label for="termsCheck">Acepto los <a href="terminos.html" class="terms-link">términos y condiciones</a></label>
+                    </div>
+
+                    <button type="submit" class="add-btn btn-primary" style="width:100%; padding: 15px;">Ingresar</button>
+                    
+                    <a href="#" class="forgot-pass">Olvidé mi contraseña</a>
+                </form>
+            </div>
+        </div>
+        <div class="login-right">
+            <h1>Estás a punto de entrar en tu sitio preferido de compras</h1>
+            <p class="label-large" style="opacity: 0.8;">Salud y bienestar a solo un clic de distancia.</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { fixPath } from './app.js';
+        
+        // Password Toggle Logic
+        const toggleBtn = document.getElementById('togglePass');
+        const passInput = document.getElementById('loginPass');
+
+        if (toggleBtn && passInput) {
+            toggleBtn.addEventListener('click', () => {
+                const isPass = passInput.type === 'password';
+                passInput.type = isPass ? 'text' : 'password';
+                
+                // Optional: Update icon based on state
+                toggleBtn.innerHTML = isPass 
+                    ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`
+                    : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
+            });
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            
+            // Simulation
+            localStorage.setItem('pharma_user', JSON.stringify({
+                email: email,
+                name: 'Usuario Premium',
+                role: 'client'
+            }));
+
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Promociones - iSAGI Shop and bulk</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .promotions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            padding: 20px 0;
+        }
+
+        .promo-card {
+            background: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--radius-card);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: var(--transition);
+        }
+
+        .promo-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .promo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .promo-status {
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--light-gray);
+        }
+
+        .promo-status.active {
+            background: #e6fffa;
+            color: #2c7a7b;
+        }
+
+        .promo-dates {
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: var(--white);
+            width: 100%;
+            max-width: 500px;
+            border-radius: var(--radius-card);
+            padding: 40px;
+            position: relative;
+        }
+
+        .modal-header {
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--radius-button);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Dynamic Header -->
+    <div id="mainHeader"></div>
+
+    <!-- Cart Drawer (Common) -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>Tu Carrito</h3>
+            <button class="icon-button" id="closeCart" data-tooltip="Cerrar carrito">X</button>
+        </div>
+        <div class="cart-body" id="cartBody"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotalText">S/ 0.00</span>
+            </div>
+            <div class="cart-footer-actions">
+                <button class="add-btn btn-primary" id="checkoutBtn" data-tooltip="Finalizar compra">Finalizar Compra</button>
+                <button id="clearCartBtn" class="clear-cart-btn-icon" data-tooltip="Vaciar carrito">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="padding-top: 40px;">
+        <main style="grid-template-columns: 1fr;">
+            <section class="store-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <div>
+                        <h1>Gestión de Promociones</h1>
+                        <p class="label-small grayscale-60">Configura tus campañas y periodos de vigencia.</p>
+                    </div>
+                    <button class="add-btn btn-primary" id="addPromoBtn" style="flex: 0;">+ Nueva Promoción</button>
+                </div>
+
+                <div class="promotions-grid" id="promotionsGrid">
+                    <!-- Dynamic rendering -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Form -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nueva Promoción</h3>
+            </div>
+            <form id="promoForm">
+                <input type="hidden" id="promoId">
+                <div class="form-group">
+                    <label>Nombre de la Promoción</label>
+                    <input type="text" id="promoName" required placeholder="Ej. CyberWow">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Inicio</label>
+                    <input type="date" id="promoStart" required>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Fin</label>
+                    <input type="date" id="promoEnd" required>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button type="button" class="add-btn btn-outline-secondary" id="cancelBtn">Cancelar</button>
+                    <button type="submit" class="add-btn btn-primary">Guardar Promoción</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="../app.js"></script>
+    <script type="module">
+        import { campaigns } from '../data.js';
+        
+        // This logic could be in app.js or here
+        // I'll add specific listeners for the promotions logic
+    </script>
+</body>
+</html>
