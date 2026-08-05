@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos - iSAGI Shop and bulk</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .orders-container {
+            padding: 40px 0;
+            width: 100%;
+        }
+
+        /* Tabs Styling */
+        .tabs-header {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid var(--medium-gray);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .tab-btn {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--secondary-text);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-text);
+            background: var(--light-gray);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-text);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .orders-table-wrapper {
+            background: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: 0; /* Bordes rectos para un look más moderno/técnico */
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px; /* Tamaño solicitado */
+        }
+
+        .orders-table th {
+            background: var(--light-gray);
+            text-align: left;
+            padding: 12px 25px;
+            font-weight: 700;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .orders-table td {
+            padding: 5px 25px; /* Padding de 5px para altura total de ~24px */
+            border-bottom: 1px solid var(--light-gray);
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+
+        .orders-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .orders-table tr:hover {
+            background: #fafafa;
+        }
+
+        .order-id-cell {
+            font-weight: 700;
+            color: var(--primary-text);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #e6fffa;
+            color: #2c7a7b;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: currentColor;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .empty-state {
+            text-align: center; 
+            padding: 80px; 
+            background: var(--white); 
+            border-radius: 24px; 
+            border: 1px dashed var(--medium-gray);
+        }
+
+        /* Account Status Card */
+        .account-card {
+            background: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--radius-card);
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-item {
+            padding: 20px;
+            background: var(--light-gray);
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-text);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 768px) {
+            .account-card {
+                grid-template-columns: 1fr;
+            }
+            .tabs-header {
+                flex-direction: column;
+                border-bottom: none;
+                gap: 10px;
+            }
+            .tab-btn {
+                border-radius: 8px;
+                border: 1px solid var(--medium-gray);
+            }
+            .tab-btn.active::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="mainHeader"></div>
+
+    <div class="container">
+        <div class="orders-container">
+            <h2 style="margin-bottom: 30px; font-family: 'Inter', sans-serif; font-weight: 800;">Mi Perfil</h2>
+            
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="pedidos">Mis Pedidos</button>
+                <button class="tab-btn" data-tab="estado">Estado de Cuenta</button>
+                <button class="tab-btn" data-tab="direcciones">Mis Direcciones</button>
+            </div>
+
+            <!-- Tab: Mis Pedidos -->
+            <div class="tab-content active" id="tab-pedidos">
+                <div id="ordersList">
+                    <!-- Dynamic Orders -->
+                </div>
+            </div>
+
+            <!-- Tab: Estado de Cuenta -->
+            <div class="tab-content" id="tab-estado">
+                <div class="account-card">
+                    <div class="stat-item">
+                        <span class="stat-label">Pedidos Totales</span>
+                        <span class="stat-val" id="totalOrdersCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Inversión Total</span>
+                        <span class="stat-val" id="totalInvestment">S/ 0.00</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Items Comprados</span>
+                        <span class="stat-val" id="totalItemsCount">0</span>
+                    </div>
+                </div>
+                <div style="margin-top: 30px;" id="ordersTablePlaceholder">
+                    <!-- Same table will be rendered here if needed -->
+                </div>
+            </div>
+
+            <!-- Tab: Mis Direcciones -->
+            <div class="tab-content" id="tab-direcciones">
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 20px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <h4>Gestiona tus direcciones de envío aquí.</h4>
+                    <p class="label-small" style="margin-top: 10px;">Aún no has registrado direcciones adicionales.</p>
+                    <button class="add-address-btn">AGREGAR DIRECCIÓN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+    <script type="module">
+        const orders = JSON.parse(localStorage.getItem('pharmaOrders')) || [];
+        
+        function renderOrders() {
+            const container = document.getElementById('ordersList');
+            const stateTable = document.getElementById('ordersTablePlaceholder');
+
+            if (orders.length === 0) {
+                const emptyHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.2; margin-bottom: 20px;"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                        <h4>No has realizado pedidos aún.</h4>
+                        <a href="index.html" class="add-btn btn-primary" style="margin-top: 20px; display: inline-flex; text-decoration: none;">Ir a la tienda</a>
+                    </div>
+                `;
+                container.innerHTML = emptyHTML;
+                return;
+            }
+
+            const tableHTML = `
+                <div class="orders-table-wrapper">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th># Pedido</th>
+                                <th>Generado</th>
+                                <th>Estado</th>
+                                <th>Items</th>
+                                <th style="text-align: right;">Total (IGV inc.)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${orders.slice().reverse().map(order => `
+                                <tr>
+                                    <td class="order-id-cell">#${order.id}</td>
+                                    <td>
+                                        <div style="font-weight: 600;">${order.date || 'N/A'}</div>
+                                        <div class="label-extra-small" style="color: var(--secondary-text);">${order.time || ''}</div>
+                                    </td>
+                                    <td><span class="status-badge">${order.status || 'EN ESPERA DE DESPACHO'}</span></td>
+                                    <td>${order.itemCount || (order.items ? order.items.length : 0)} unidades</td>
+                                    <td style="text-align: right; font-weight: 700;">S/ ${parseFloat(order.total || 0).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.innerHTML = tableHTML;
+            stateTable.innerHTML = tableHTML;
+
+            // Stats for Estado de Cuenta
+            const totalItems = orders.reduce((acc, o) => acc + (o.itemCount || 0), 0);
+            const totalMoney = orders.reduce((acc, o) => acc + parseFloat(o.total || 0), 0);
+            
+            document.getElementById('totalOrdersCount').textContent = orders.length;
+            document.getElementById('totalItemsCount').textContent = totalItems;
+            document.getElementById('totalInvestment').textContent = `S/ ${totalMoney.toFixed(2)}`;
+        }
+
+        // Tab Switching Logic
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                
+                // Active button
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Active content
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`tab-${tab}`).classList.add('active');
+            });
+        });
+
+        renderOrders();
+
+        // Tab switching from URL parameters on load
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('tab');
+        if (activeTab) {
+            const targetBtn = document.querySelector(`.tab-btn[data-tab="${activeTab}"]`);
+            if (targetBtn) targetBtn.click();
+        }
+    </script>
+</body>
+</html>

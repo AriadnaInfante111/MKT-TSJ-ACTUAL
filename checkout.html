@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Compra - TOUCH</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            padding: 40px 0;
+        }
+
+        .checkout-main {
+            background: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--radius-card);
+            padding: 40px;
+        }
+
+        .checkout-summary {
+            background: var(--light-gray);
+            border-radius: var(--radius-card);
+            padding: 30px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .summary-total {
+            border-top: 2px solid var(--medium-gray);
+            padding-top: 15px;
+            margin-top: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .checkout-item {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .checkout-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-button);
+            background: var(--light-gray);
+            object-fit: contain;
+        }
+
+        @media (max-width: 1024px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="index.html" class="logo">TOUCH<span>.</span></a>
+            <h4>Finalizar Compra</h4>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="checkout-container">
+            <div class="checkout-main">
+                <h3>Detalles de tu pedido</h3>
+                <div id="checkoutItems">
+                    <!-- Items summary -->
+                </div>
+            </div>
+
+            <div class="checkout-summary">
+                <h4>Resumen</h4>
+                <div style="margin-top: 20px;">
+                    <div class="summary-row"><span>Subtotal:</span><span id="subtotal">S/ 0.00</span></div>
+                    <div class="summary-row"><span>Envío:</span><span>S/ 0.00 (Gratis)</span></div>
+                    <div class="summary-total"><div class="summary-row"><span>Total:</span><span id="total">S/ 0.00</span></div></div>
+                    <button class="add-btn btn-primary" id="payBtn" style="width: 100%; height: 50px; margin-top: 20px;">
+                        Procesar Pedido
+                    </button>
+                    <p class="label-extra-small" style="text-align: center; margin-top: 15px; color: #999;">
+                        Tu pedido será enviado directamente a un asesor de ventas para su atención inmediata.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const cart = JSON.parse(localStorage.getItem('pharmaCart')) || [];
+        const itemsContainer = document.getElementById('checkoutItems');
+        const subtotalEl = document.getElementById('subtotal');
+        const totalEl = document.getElementById('total');
+        const payBtn = document.getElementById('payBtn');
+
+        if (cart.length === 0) {
+            itemsContainer.innerHTML = '<h4>No hay productos en tu carrito.</h4><a href="index.html">Volver a la tienda</a>';
+            payBtn.disabled = true;
+            payBtn.style.opacity = '0.5';
+        } else {
+            itemsContainer.innerHTML = cart.map(item => `
+                <div class="checkout-item">
+                    <img src="${item.image}">
+                    <div style="flex:1">
+                        <h6>${item.name}</h6>
+                        <span class="label-small">${item.laboratory}</span>
+                    </div>
+                    <div style="text-align: right">
+                        <div><b>S/ ${item.price.toFixed(2)} x ${item.quantity}</b></div>
+                        <div class="label-small">S/ ${(item.price * item.quantity).toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            const igv = subtotal * 0.18;
+            const total = subtotal + igv;
+            
+            subtotalEl.textContent = `S/ ${subtotal.toFixed(2)}`;
+            totalEl.innerHTML = `
+                <div style="font-size: 0.8rem; color: var(--secondary-text); font-weight: normal; margin-bottom: 5px;">IGV (18%): S/ ${igv.toFixed(2)}</div>
+                S/ ${total.toFixed(2)}
+            `;
+
+            payBtn.addEventListener('click', () => {
+                // Create Order
+                const orders = JSON.parse(localStorage.getItem('pharmaOrders')) || [];
+                const now = new Date();
+                const newOrder = {
+                    id: Math.floor(100000 + Math.random() * 900000),
+                    date: now.toLocaleDateString(),
+                    time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    items: cart,
+                    subtotal: subtotal,
+                    igv: igv,
+                    total: total,
+                    itemCount: cart.reduce((acc, item) => acc + item.quantity, 0),
+                    status: 'EN ESPERA DE DESPACHO'
+                };
+                
+                orders.push(newOrder);
+                localStorage.setItem('pharmaOrders', JSON.stringify(orders));
+                
+                // Clear Cart
+                localStorage.removeItem('pharmaCart');
+                
+                // Alert and Redirect
+                payBtn.innerHTML = "Enviando pedido...";
+                payBtn.disabled = true;
+                setTimeout(() => {
+                    alert("¡Pedido procesado con éxito! Un asesor se pondrá en contacto contigo.");
+                    window.location.href = "pedidos.html";
+                }, 1500);
+            });
+        }
+    </script>
+</body>
+</html>
