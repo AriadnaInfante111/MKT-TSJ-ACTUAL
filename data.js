@@ -49,6 +49,28 @@ const baseProducts = [
     { articulo: "7066", name: "Toalla Premium 1.45x0.75", category: "Touch", laboratory: "San Jacinto", price: 29.43, costo: 20.60, dim: "1.45 x 0.75 m", pack: "12" }
 ];
 
+const colorImages = {
+    "Blanco": "./TOALLAS COLORES/BLANCO.png",
+    "Negro": "./TOALLAS COLORES/NEGRO.png",
+    "Azul": "./TOALLAS COLORES/AZUL.png",
+    "Plomo": "./TOALLAS COLORES/PLOMO.png",
+    "Crema": "./TOALLAS COLORES/CREMA.png",
+    "Azul Colombia": "./TOALLAS COLORES/AZUL COLOMBIA.png",
+    "Beige": "./TOALLAS COLORES/BEIGE.png",
+    "Celeste Fox": "./TOALLAS COLORES/CELESTE FOX.png",
+    "Verde Laurel": "./TOALLAS COLORES/Mesa de trabajo 9.png",
+    "Acero": "./TOALLAS COLORES/Mesa de trabajo 10.png",
+    "Lila": "./TOALLAS COLORES/LILA.png",
+    "Fresa": "./TOALLAS COLORES/FRESA.png",
+    "Tierra": "./TOALLAS COLORES/TIERRA.png",
+    "Rosa Fuerte": "./TOALLAS COLORES/ROSA FUERTE.png",
+    "Cocona": "./TOALLAS COLORES/COCONA.png",
+    "Fucsia": "./TOALLAS COLORES/Fucsia.png",
+    "Guinda TX": "./TOALLAS COLORES/GUINDA TX.png",
+    "Purpura": "./TOALLAS COLORES/PURPURA.png",
+    "Verde Oscuro": "./TOALLAS COLORES/VERDE OSCURO.png"
+};
+
 let products = [];
 let idCounter = 1;
 
@@ -73,12 +95,13 @@ baseProducts.forEach(base => {
             colorCode: code,
             stock_unidades: stockUnits,
             stock_paquetes: stockPacks,
-            image: "./assets/product.png",
+            image: colorImages[color] || "./assets/product.png",
             isFavorite: Math.random() > 0.9,
             offers: Math.random() > 0.8 ? ["Día de la Madre"] : (Math.random() > 0.9 ? ["25% de descuento"] : [])
         });
     });
 });
+
 
 products.shift(); // Borra el primer producto de la lista ("Toalla Belleza 150x75 - Blanco")
 
