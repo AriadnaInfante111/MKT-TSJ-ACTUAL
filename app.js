@@ -315,8 +315,6 @@ function renderProducts(skipAnim = false) {
 
 function renderCardHTML(p) {
     const qty = Store.getQuantity(p.id);
-    const lab = (p.laboratory || '').trim().toLowerCase();
-    const badgeColor = lab === 'san jacinto' ? '#FFC635' : '#DDA107';
     
     return `
         <article class="product-card">
@@ -328,7 +326,7 @@ function renderCardHTML(p) {
                 ${p.offers.length > 0 ? `<span class="card-tag">${p.offers[0]}</span>` : ''}
             </div>
             <div class="card-info">
-                 <span class="card-articulo" style="background-color: ${badgeColor};">${p.articulo}</span>
+                 <span class="card-articulo">${p.articulo}</span>
                  <a href="${fixPath('producto.html')}?id=${p.id}" class="card-name-link">
                     <h6 class="card-name">${p.name}</h6>
                     <span class="card-brand">${p.laboratory}</span>
@@ -354,6 +352,42 @@ function renderCardHTML(p) {
         </article>`;
 }
 
+window.changeProductImage = function(src, thumbElement) {
+    const mainImg = document.getElementById('mainProductImg');
+    if (!mainImg) return;
+    mainImg.style.transition = 'opacity 0.2s ease-in-out';
+    mainImg.style.opacity = '0';
+    setTimeout(() => {
+        mainImg.src = src;
+        mainImg.style.opacity = '1';
+    }, 200);
+    
+    // Update active class on thumbnails
+    const thumbnails = thumbElement.parentNode.querySelectorAll('.detail-thumb');
+    thumbnails.forEach(t => t.classList.remove('active'));
+    thumbElement.classList.add('active');
+};
+
+window.nextProductImage = function(btnElement) {
+    const gallery = btnElement.closest('.product-gallery');
+    if (!gallery) return;
+    const thumbs = Array.from(gallery.querySelectorAll('.detail-thumb'));
+    if (thumbs.length <= 1) return;
+    const activeIndex = thumbs.findIndex(t => t.classList.contains('active'));
+    const nextIndex = (activeIndex + 1) % thumbs.length;
+    thumbs[nextIndex].click();
+};
+
+window.prevProductImage = function(btnElement) {
+    const gallery = btnElement.closest('.product-gallery');
+    if (!gallery) return;
+    const thumbs = Array.from(gallery.querySelectorAll('.detail-thumb'));
+    if (thumbs.length <= 1) return;
+    const activeIndex = thumbs.findIndex(t => t.classList.contains('active'));
+    const prevIndex = (activeIndex - 1 + thumbs.length) % thumbs.length;
+    thumbs[prevIndex].click();
+};
+
 function renderProductDetail(id) {
     const detail = document.getElementById('productDetail');
     if (!detail) return;
@@ -367,7 +401,25 @@ function renderProductDetail(id) {
 
     detail.innerHTML = `
         <div class="product-detail-container">
-            <div class="product-detail-img"><img src="${fixPath(p.image)}"></div>
+            <div class="product-gallery">
+                <div class="product-detail-img">
+                    <button class="gallery-nav-btn prev-btn" onclick="window.prevProductImage(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <img id="mainProductImg" src="${fixPath(p.image)}" style="transition: opacity 0.2s ease-in-out;">
+                    <button class="gallery-nav-btn next-btn" onclick="window.nextProductImage(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+                <div class="detail-thumbnails">
+                    <div class="detail-thumb active" onclick="window.changeProductImage('${fixPath(p.image)}', this)">
+                        <img src="${fixPath(p.image)}">
+                    </div>
+                    <div class="detail-thumb" onclick="window.changeProductImage('${fixPath(p.image2)}', this)">
+                        <img src="${fixPath(p.image2)}">
+                    </div>
+                </div>
+            </div>
             <div class="product-detail-info">
                 <h1 style="margin-bottom: 5px;">${p.name}</h1>
                 <div class="detail-subtitle" style="font-size: 1.1rem; color: var(--secondary-text); margin-bottom: 10px; font-weight: 500;">${p.laboratory} | ${p.category}</div>
@@ -412,7 +464,7 @@ function renderProductDetail(id) {
                         ${relatedColors.map(rc => `
                             <a href="${fixPath('producto.html')}?id=${rc.id}" class="mini-card" style="text-decoration: none; color: inherit; width: calc(12.5% - 16px); min-width: 110px; background: var(--white); border: 1px solid var(--medium-gray); border-radius: 12px; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: block;">
                                 <div class="mini-card-img" style="height: 90px; background: var(--light-gray); display: flex; align-items: center; justify-content: center; padding: 10px;">
-                                    <img src="${fixPath(rc.image)}" style="max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease;">
+                                    <img src="${fixPath(rc.image2 || rc.image)}" style="max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease;">
                                 </div>
                                 <div class="mini-card-info" style="padding: 10px; text-align: center;">
                                     <div style="font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${rc.colorCode} ${rc.colores[0]}</div>
@@ -523,8 +575,17 @@ function setupEventListeners() {
 
         // Favorites
         if (target.closest('.favorite-btn')) {
+            const btn = target.closest('.favorite-btn');
             const p = initialProducts.find(prod => prod.id === id);
             p.isFavorite = !p.isFavorite;
+            
+            // Toggle active class and SVG fill on the clicked button
+            btn.classList.toggle('active', p.isFavorite);
+            const svg = btn.querySelector('svg');
+            if (svg) {
+                svg.setAttribute('fill', p.isFavorite ? 'currentColor' : 'none');
+            }
+
             const h = document.getElementById('headerHeart');
             if (h) { 
                 h.classList.remove('anim-heartbeat'); 
@@ -533,7 +594,12 @@ function setupEventListeners() {
                 h.style.fill = p.isFavorite ? 'var(--heart-red)' : 'none'; 
                 h.style.color = p.isFavorite ? 'var(--heart-red)' : 'inherit'; 
             }
-            Store.notify();
+
+            if (activeFilters.onlyFavorites) {
+                renderProducts(true); // Re-render without entry animation to remove the unfavorited item
+            } else {
+                Store.notify();
+            }
         } 
         // Add to Cart
         if (e.target.closest('.add-btn')) {

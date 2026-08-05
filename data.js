@@ -58,8 +58,8 @@ const colorImages = {
     "Azul Colombia": "./TOALLAS COLORES/AZUL COLOMBIA.png",
     "Beige": "./TOALLAS COLORES/BEIGE.png",
     "Celeste Fox": "./TOALLAS COLORES/CELESTE FOX.png",
-    "Verde Laurel": "./TOALLAS COLORES/Mesa de trabajo 9.png",
-    "Acero": "./TOALLAS COLORES/Mesa de trabajo 10.png",
+    "Verde Laurel": "./TOALLAS COLORES/VERDE LAUREL.png",
+    "Acero": "./TOALLAS COLORES/ACERO.png",
     "Lila": "./TOALLAS COLORES/LILA.png",
     "Fresa": "./TOALLAS COLORES/FRESA.png",
     "Tierra": "./TOALLAS COLORES/TIERRA.png",
@@ -69,6 +69,28 @@ const colorImages = {
     "Guinda TX": "./TOALLAS COLORES/GUINDA TX.png",
     "Purpura": "./TOALLAS COLORES/PURPURA.png",
     "Verde Oscuro": "./TOALLAS COLORES/VERDE OSCURO.png"
+};
+
+const colorImagesPeque = {
+    "Blanco": "./TOALLAS COLORES PEQUE/BLANCO.png",
+    "Negro": "./TOALLAS COLORES PEQUE/NEGRO.png",
+    "Azul": "./TOALLAS COLORES PEQUE/AZUL.png",
+    "Plomo": "./TOALLAS COLORES PEQUE/PLOMO.png",
+    "Crema": "./TOALLAS COLORES PEQUE/CREMA.png",
+    "Azul Colombia": "./TOALLAS COLORES PEQUE/AZUL COLOMBIA.png",
+    "Beige": "./TOALLAS COLORES PEQUE/BEIGE.png",
+    "Celeste Fox": "./TOALLAS COLORES PEQUE/CELESTE FOX.png",
+    "Verde Laurel": "./TOALLAS COLORES PEQUE/VERDE LAUREL.png",
+    "Acero": "./TOALLAS COLORES PEQUE/ACERO.png",
+    "Lila": "./TOALLAS COLORES PEQUE/LILA.png",
+    "Fresa": "./TOALLAS COLORES PEQUE/FRESA.png",
+    "Tierra": "./TOALLAS COLORES PEQUE/TIERRA.png",
+    "Rosa Fuerte": "./TOALLAS COLORES PEQUE/ROSA FUERTE.png",
+    "Cocona": "./TOALLAS COLORES PEQUE/COCONA.png",
+    "Fucsia": "./TOALLAS COLORES PEQUE/Fucsia.png",
+    "Guinda TX": "./TOALLAS COLORES PEQUE/GUINDA TX.png",
+    "Purpura": "./TOALLAS COLORES PEQUE/PURPURA.png",
+    "Verde Oscuro": "./TOALLAS COLORES PEQUE/VERDE OSCURO.png"
 };
 
 let products = [];
@@ -96,11 +118,13 @@ baseProducts.forEach(base => {
             stock_unidades: stockUnits,
             stock_paquetes: stockPacks,
             image: colorImages[color] || "./assets/product.png",
+            image2: colorImagesPeque[color] || "./assets/product.png",
             isFavorite: Math.random() > 0.9,
             offers: Math.random() > 0.8 ? ["Día de la Madre"] : (Math.random() > 0.9 ? ["25% de descuento"] : [])
         });
     });
 });
+
 
 
 products.shift(); // Borra el primer producto de la lista ("Toalla Belleza 150x75 - Blanco")
