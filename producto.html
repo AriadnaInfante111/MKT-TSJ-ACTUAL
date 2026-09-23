@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -14,43 +14,16 @@
             align-items: start;
         }
 
-        .product-detail-img {
-            width: 100%;
-            aspect-ratio: 1;
-            background: var(--light-gray);
-            border-radius: var(--radius-card);
-            overflow: hidden;
-        }
-
-        .product-detail-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            mix-blend-mode: multiply;
-        }
-
         .product-detail-info {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .detail-lab {
-            font-size: 0.9rem;
-            color: var(--secondary-text);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
         .detail-price {
             font-size: 2.5rem;
             font-weight: 700;
             color: var(--primary-text);
-        }
-
-        .detail-description {
-            color: var(--secondary-text);
-            line-height: 1.6;
         }
 
         .detail-actions {
@@ -88,6 +61,13 @@
             border-radius: var(--radius-card);
             overflow: hidden;
             border: 1px solid var(--medium-gray);
+        }
+
+        .product-detail-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            mix-blend-mode: multiply;
         }
 
         .detail-thumbnails {
@@ -152,13 +132,8 @@
             transform: translateY(-50%) scale(1.1);
         }
 
-        .gallery-nav-btn.prev-btn {
-            left: 12px;
-        }
-
-        .gallery-nav-btn.next-btn {
-            right: 12px;
-        }
+        .gallery-nav-btn.prev-btn { left: 12px; }
+        .gallery-nav-btn.next-btn { right: 12px; }
 
         .product-detail-img:hover .gallery-nav-btn {
             opacity: 1;
@@ -169,11 +144,91 @@
         .gallery-nav-btn svg {
             width: 28px;
             height: 28px;
-            transition: transform 0.2s;
         }
 
-        .gallery-nav-btn:active svg {
-            transform: scale(0.85);
+        .variant-panel {
+            margin-top: 8px;
+            padding: 12px;
+            background: #fafafa;
+            border-radius: 16px;
+        }
+
+        .variant-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--secondary-text);
+            margin-bottom: 10px;
+        }
+
+        .color-swatch-grid {
+            display: grid;
+            grid-template-columns: repeat(10, minmax(0, 1fr));
+            grid-template-rows: repeat(2, auto);
+            gap: 8px;
+        }
+
+        .color-swatch {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            overflow: hidden;
+            background: var(--white);
+            display: block;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .color-swatch img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            mix-blend-mode: multiply;
+        }
+
+        .color-swatch:hover {
+            transform: translateY(-2px) scale(1.04);
+            border-color: var(--primary);
+        }
+
+        .color-swatch.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px #FFF4D4;
+        }
+
+        .size-chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .size-chip {
+            padding: 8px 12px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--medium-gray);
+            background: var(--white);
+            text-decoration: none;
+            color: var(--primary-text);
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .size-chip:hover {
+            transform: translateY(-1px);
+            border-color: var(--primary);
+        }
+
+        .size-chip.selected {
+            border-color: var(--primary);
+            background: #FFF8DC;
+        }
+
+        @media (max-width: 900px) {
+            .color-swatch-grid {
+                grid-template-columns: repeat(8, minmax(0, 1fr));
+            }
         }
 
         @media (max-width: 768px) {
@@ -187,7 +242,6 @@
 <body>
     <div id="mainHeader"></div>
 
-    <!-- Cart Drawer (Same as Index) -->
     <div class="cart-overlay" id="cartOverlay"></div>
     <div class="cart-drawer" id="cartDrawer">
         <div class="cart-header">
@@ -221,28 +275,16 @@
 
     <div class="container" style="padding-top: 40px;">
         <main class="product-page-main">
-            <!-- Product Content -->
             <section class="store-content">
                 <a href="index.html" class="back-link">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                     Volver a la tienda
                 </a>
-
-                <div id="productDetail">
-                    <!-- Dynamic Detail Content -->
-                </div>
+                <div id="productDetail"></div>
             </section>
         </main>
     </div>
 
-    <script type="module">
-        import { products } from './data.js';
-        
-        // This script will handle the logic for AND share the same cart as app.js
-        // For simplicity in this demo, I'll ensure they use the same modular logic.
-        // In a real app, cart logic should be in a separate cart.js
-    </script>
-    <!-- Confirmation Modal -->
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-title">¿Vaciar carrito?</div>

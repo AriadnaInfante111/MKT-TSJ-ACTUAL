@@ -50,6 +50,10 @@
                 <span>Subtotal:</span>
                 <span id="cartSubtotalText">S/ 0.00</span>
             </div>
+            <div class="cart-row" id="cartDiscountRow" style="display: none; font-weight: 600;">
+                <span>Descuento:</span>
+                <span id="cartDiscountText" style="color: var(--heart-red);">-S/ 0.00</span>
+            </div>
             <div class="cart-row">
                 <span>IGV (18%):</span>
                 <span id="cartTaxText">S/ 0.00</span>
@@ -172,7 +176,7 @@
             <div class="modal-text">Se eliminarán todos los productos de tu lista. Esta acción no se puede deshacer.</div>
             <div class="modal-actions">
                 <button id="cancelModalBtn" class="modal-btn btn-cancel">Cancelar</button>
-                <button id="confirmModalBtn" class="modal-btn btn-confirm">Vaciar Todo</button>
+                <button id="confirmModalBtn" class="modal-btn btn-confirm">Aceptar</button>
             </div>
         </div>
     </div>

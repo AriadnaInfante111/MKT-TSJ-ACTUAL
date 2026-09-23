@@ -1,10 +1,40 @@
 import { categories, laboratories, colors, sizes, campaigns as initialCampaignList, products as initialProducts } from './data.js';
 
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function getRandomizedProducts(products) {
+    const shuffled = shuffleArray(products);
+    const discounted = shuffled.filter(p => p.originalPrice !== null);
+    const regular = shuffled.filter(p => p.originalPrice === null);
+
+    if (discounted.length === 0) return shuffled;
+
+    const firstDiscounted = discounted.shift();
+    const nextNine = shuffleArray([
+        ...discounted.splice(0, 3),
+        ...regular.splice(0, 6)
+    ]);
+
+    return [
+        firstDiscounted,
+        ...nextNine,
+        ...discounted,
+        ...regular
+    ];
+}
+
 /** 
  * STORE & STATE
  */
 const Store = {
-    products: initialProducts,
+    products: getRandomizedProducts(initialProducts),
     cart: JSON.parse(localStorage.getItem('pharmaCart')) || [],
     campaigns: JSON.parse(localStorage.getItem('pharmaCampaigns')) || initialCampaignList,
     currentView: localStorage.getItem('pharmaView') || 'cols-3',
@@ -197,7 +227,8 @@ function init() {
             activeFilters.campaigns = [promoParam];
             // Also need to check the checkbox in sidebar if it exists
             setTimeout(() => {
-                const cb = document.querySelector(`input[data-type="campaigns"][data-value="${promoParam}"]`);
+                const cb = [...document.querySelectorAll('input[data-type="campaigns"]')]
+                    .find(el => el.dataset.value === promoParam);
                 if (cb) cb.checked = true;
             }, 100);
         }
@@ -205,7 +236,7 @@ function init() {
         // Check for favorites param
         const favsParam = urlParams.get('favs');
         if (favsParam === 'true') {
-            activeFilters.favoritesOnly = true;
+            activeFilters.onlyFavorites = true;
             const hBtn = document.getElementById('favoritesBtn');
             if (hBtn) hBtn.querySelector('svg').style.fill = 'var(--heart-red)';
         }
@@ -217,15 +248,51 @@ function init() {
     setupEventListeners();
     updateCartCount();
     renderCart();
+    initSoftScrollbars();
 }
 
+function bindSoftScrollbar(el) {
+    if (!el || el.dataset.scrollFadeBound === '1') return;
+    el.dataset.scrollFadeBound = '1';
+    el.classList.add('soft-scroll');
+
+    let fadeTimer = null;
+    const showThumb = () => {
+        el.classList.add('is-scroll-active');
+        clearTimeout(fadeTimer);
+        fadeTimer = setTimeout(() => {
+            el.classList.remove('is-scroll-active');
+        }, 900);
+    };
+
+    el.addEventListener('scroll', showThumb, { passive: true });
+    el.addEventListener('wheel', showThumb, { passive: true });
+    el.addEventListener('touchmove', showThumb, { passive: true });
+}
+
+function initSoftScrollbars() {
+    const selectors = [
+        '.sidebar',
+        '.cart-body',
+        '.order-cart-list',
+        '.cart-items-scroller',
+        '.return-sidebar',
+        '.soft-scroll'
+    ];
+    document.querySelectorAll(selectors.join(',')).forEach(bindSoftScrollbar);
+}
+
+window.initSoftScrollbars = initSoftScrollbars;
+
 function renderFilterLists() {
+    const slugify = (val) => String(val).toLowerCase().replace(/[^a-z0-9]+/gi, '-').replace(/(^-|-$)/g, '');
     const renderItems = (id, items, type) => {
         const container = document.getElementById(id);
         if (container) {
             container.innerHTML = items.map(item => {
                 const val = typeof item === 'object' ? item.name : item;
-                return `<li class="filter-item"><input type="checkbox" id="${type}-${val}" data-type="${type}" data-value="${val}"><label for="${type}-${val}">${val}</label></li>`;
+                const safeId = `${type}-${slugify(val)}`;
+                return `<li class="filter-item"><input type="checkbox" id="${safeId}" data-type="${type}" data-value="${val}"><label for="${safeId}">${val}</label></li>`;
             }).join('');
         }
     };
@@ -239,13 +306,37 @@ function renderFilterLists() {
 function updateGridQuantities() {
     const grid = getProductGrid();
     if (!grid) return;
-    const selectors = grid.querySelectorAll('.qty-selector');
-    selectors.forEach(sel => {
-        const id = parseInt(sel.dataset.id);
-        const input = sel.querySelector('.qty-input');
-        if (input) {
-            const currentQty = Store.getQuantity(id);
-            input.value = currentQty || 1;
+
+    // 1. Obtener todos los elementos del carrito
+    const cartItems = Store.cart;
+    const cartMap = {};
+    cartItems.forEach(item => {
+        cartMap[item.id] = item.quantity;
+    });
+
+    // 2. Sincronizar selectores de la grilla
+    grid.querySelectorAll('.qty-selector').forEach(selector => {
+        const id = parseInt(selector.dataset.id);
+        const input = selector.querySelector('.qty-input');
+        const productCard = selector.closest('.product-card');
+        
+        if (!input) return;
+
+        if (cartMap[id] !== undefined) {
+            // Si el producto está en el carrito, se sincroniza con el carrito y se bloquea el estado
+            input.value = cartMap[id];
+            if (productCard) productCard.setAttribute('data-in-cart', 'true');
+        } else {
+            // Si NO está en el carrito, se conserva la cantidad que el usuario está preparando
+            if (productCard) {
+                const wasInCart = productCard.getAttribute('data-in-cart') === 'true';
+                if (wasInCart) {
+                    // Si el producto acaba de salir del carrito, reseteamos a 1
+                    input.value = 1;
+                    productCard.removeAttribute('data-in-cart');
+                }
+                // Si no estaba en el carrito, mantenemos la cantidad actual que preparó el usuario
+            }
         }
     });
 }
@@ -258,13 +349,18 @@ function renderProducts(skipAnim = false) {
 
     const render = () => {
         const filtered = Store.products.filter(p => {
-            const search = activeFilters.search.toLowerCase();
-            const matchesSearch = p.name.toLowerCase().includes(search) || (p.laboratory && p.laboratory.toLowerCase().includes(search));
+            const search = activeFilters.search.toLowerCase().trim();
+            const matchesSearch = !search ||
+                p.name.toLowerCase().includes(search) ||
+                (p.laboratory && p.laboratory.toLowerCase().includes(search)) ||
+                (p.category && p.category.toLowerCase().includes(search)) ||
+                (p.articulo && String(p.articulo).toLowerCase().includes(search)) ||
+                (p.colores && p.colores.some(c => c.toLowerCase().includes(search)));
             const matchesCat = activeFilters.categories.length === 0 || activeFilters.categories.includes(p.category);
             const matchesLab = activeFilters.laboratories.length === 0 || activeFilters.laboratories.includes(p.laboratory);
-            const matchesColor = activeFilters.colors.length === 0 || activeFilters.colors.some(c => p.colores.includes(c));
+            const matchesColor = activeFilters.colors.length === 0 || activeFilters.colors.some(c => p.colores && p.colores.includes(c));
             const matchesSize = activeFilters.sizes.length === 0 || activeFilters.sizes.includes(p.dimensiones);
-            const matchesCamp = activeFilters.campaigns.length === 0 || activeFilters.campaigns.some(c => p.offers.includes(c));
+            const matchesCamp = activeFilters.campaigns.length === 0 || activeFilters.campaigns.some(c => p.offers && p.offers.includes(c));
             const matchesFav = !activeFilters.onlyFavorites || p.isFavorite;
             return matchesSearch && matchesCat && matchesLab && matchesColor && matchesSize && matchesCamp && matchesFav;
         });
@@ -315,7 +411,7 @@ function renderProducts(skipAnim = false) {
 
 function renderCardHTML(p) {
     const qty = Store.getQuantity(p.id);
-    
+
     return `
         <article class="product-card">
             <div class="card-image-wrapper">
@@ -323,31 +419,40 @@ function renderCardHTML(p) {
                 <button class="favorite-btn ${p.isFavorite ? 'active' : ''}" data-id="${p.id}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="${p.isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                 </button>
-                ${p.offers.length > 0 ? `<span class="card-tag">${p.offers[0]}</span>` : ''}
+                ${p.offers.length > 0 ? `<span class="card-tag grid-only-tag">${p.offers[0] === 'Día de la Madre' ? 'Día de la Madre -50%' : p.offers[0]}</span>` : ''}
             </div>
-            <div class="card-info">
+            <div class="card-content-wrapper">
                  <span class="card-articulo">${p.articulo}</span>
+                 ${p.offers.length > 0 ? `<span class="card-tag inline-tag">${p.offers[0] === 'Día de la Madre' ? 'Día de la Madre -50%' : p.offers[0]}</span>` : ''}
+                 
                  <a href="${fixPath('producto.html')}?id=${p.id}" class="card-name-link">
                     <h6 class="card-name">${p.name}</h6>
-                    <span class="card-brand">${p.laboratory}</span>
                  </a>
-                 <div class="card-price">S/ ${p.price.toFixed(2)}</div>
+                 
+                 <span class="card-brand">${p.laboratory}</span>
+                 
+                 <div class="card-price-group ${p.originalPrice ? 'has-discount' : ''}">
+                      <div class="card-price">S/ ${p.price.toFixed(2)}</div>
+                      ${p.originalPrice ? `<div class="original-price">S/ ${p.originalPrice.toFixed(2)}</div>` : ''}
+                 </div>
+                 
                  <div class="card-meta">Pack: ${p.pack} | Color: ${p.colorCode}</div>
-            </div>
-            <div class="card-actions">
-                <div class="qty-selector" data-id="${p.id}">
-                    <button class="qty-btn minus" data-id="${p.id}">-</button>
-                    <input type="number" value="${qty || 1}" class="qty-input" id="qty-${p.id}">
-                    <button class="qty-btn plus" data-id="${p.id}">+</button>
-                </div>
-                <div class="card-btn-group">
-                    <button class="add-btn pack-add-btn" data-id="${p.id}" data-tooltip="Agregar 1 Paquete (+${p.pack})">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
-                    </button>
-                    <button class="add-btn cart-add-btn" data-id="${p.id}" data-tooltip="Agregar cantidad actual">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-                    </button>
-                </div>
+                 
+                 <div class="card-actions">
+                     <div class="qty-selector" data-id="${p.id}">
+                         <button type="button" class="qty-btn minus" data-id="${p.id}">-</button>
+                         <input type="number" value="${qty || 1}" class="qty-input" id="qty-${p.id}">
+                         <button type="button" class="qty-btn plus" data-id="${p.id}">+</button>
+                     </div>
+                     <div class="card-btn-group">
+                         <button type="button" class="add-btn pack-add-btn" data-id="${p.id}" data-tooltip="Agregar 1 Paquete (+${p.pack})">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+                         </button>
+                         <button type="button" class="add-btn cart-add-btn" data-id="${p.id}" data-tooltip="Agregar cantidad actual">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                         </button>
+                     </div>
+                 </div>
             </div>
         </article>`;
 }
@@ -395,9 +500,26 @@ function renderProductDetail(id) {
     if (!p) { detail.innerHTML = '<h2>No encontrado</h2>'; return; }
     const qty = Store.getQuantity(p.id);
     document.title = `${p.name} - iSAGI Shop and bulk`;
-    
-    const relatedColors = initialProducts.filter(prod => prod.articulo === p.articulo && prod.dimensiones === p.dimensiones && prod.id !== p.id);
-    const relatedSizes = initialProducts.filter(prod => prod.articulo === p.articulo && prod.dimensiones !== p.dimensiones);
+
+    const familyName = p.name.replace(/ - .+$/, '').replace(/\s[\d.].*$/, '').trim();
+
+    const relatedColors = colors.map(colorName =>
+        initialProducts.find(prod =>
+            prod.articulo === p.articulo &&
+            prod.dimensiones === p.dimensiones &&
+            prod.colores[0] === colorName &&
+            (prod.id === p.id || (prod.stock_unidades || 0) > 0)
+        )
+    ).filter(Boolean);
+
+    const relatedSizes = sizes.map(dim =>
+        initialProducts.find(prod =>
+            prod.name.replace(/ - .+$/, '').replace(/\s[\d.].*$/, '').trim() === familyName &&
+            prod.colores[0] === p.colores[0] &&
+            prod.dimensiones === dim &&
+            (prod.id === p.id || (prod.stock_unidades || 0) > 0)
+        )
+    ).filter(Boolean);
 
     detail.innerHTML = `
         <div class="product-detail-container">
@@ -419,21 +541,33 @@ function renderProductDetail(id) {
                         <img src="${fixPath(p.image2)}">
                     </div>
                 </div>
+                <div class="variant-panel">
+                    <div class="variant-label">Colores</div>
+                    <div class="color-swatch-grid">
+                        ${relatedColors.map(rc => `
+                            <a href="${fixPath('producto.html')}?id=${rc.id}" class="color-swatch${rc.id === p.id ? ' selected' : ''}" title="${rc.colores[0]}">
+                                <img src="${fixPath(rc.image2 || rc.image)}" alt="${rc.colores[0]}">
+                            </a>
+                        `).join('')}
+                    </div>
+                    <div class="variant-label" style="margin-top: 14px;">Dimensiones</div>
+                    <div class="size-chip-grid">
+                        ${relatedSizes.map(rs => `
+                            <a href="${fixPath('producto.html')}?id=${rs.id}" class="size-chip${rs.id === p.id ? ' selected' : ''}">${rs.dimensiones}</a>
+                        `).join('')}
+                    </div>
+                </div>
             </div>
             <div class="product-detail-info">
                 <h1 style="margin-bottom: 5px;">${p.name}</h1>
                 <div class="detail-subtitle" style="font-size: 1.1rem; color: var(--secondary-text); margin-bottom: 10px; font-weight: 500;">${p.laboratory} | ${p.category}</div>
-                
                 <div class="product-metadata" style="margin: 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px solid var(--medium-gray); padding-top: 20px;">
                     <div class="meta-item"><strong>Fabricante:</strong> ${p.laboratory}</div>
                     <div class="meta-item"><strong>Línea:</strong> ${p.category}</div>
                     <div class="meta-item"><strong>Artículo:</strong> ${p.articulo}</div>
                     <div class="meta-item"><strong>Dimensiones:</strong> ${p.dimensiones}</div>
                     <div class="meta-item"><strong>Pack:</strong> ${p.pack}</div>
-                    <div class="meta-item" style="grid-column: span 2; margin-top: 10px; padding: 12px; background: var(--light-gray); border-radius: 8px;">
-                        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary-text); margin-bottom: 4px;">Color</div>
-                        <div style="font-size: 1.1rem; font-weight: 700; color: var(--primary-text);">${p.colorCode} - ${p.colores[0]}</div>
-                    </div>
+                    <div class="meta-item"><strong>Color:</strong> ${p.colorCode} — ${p.colores[0]}</div>
                 </div>
 
                 <div class="availability-section" style="border-top: 1px solid var(--medium-gray); padding-top: 15px; margin-top: 15px;">
@@ -443,58 +577,22 @@ function renderProductDetail(id) {
                     </div>
                 </div>
 
-                <div class="detail-price" style="font-size: 2rem; color: var(--primary-text); margin: 20px 0;">S/ ${p.price.toFixed(2)}</div>
+                <div class="detail-price" style="font-size: 2rem; color: var(--primary-text); margin: 20px 0; display: flex; align-items: center; gap: 12px;">
+                    S/ ${p.price.toFixed(2)}
+                    ${p.originalPrice ? `<span class="original-price" style="text-decoration: line-through; font-size: 1.3rem; color: var(--secondary-text); font-weight: 400;">S/ ${p.originalPrice.toFixed(2)}</span>` : ''}
+                </div>
                 
                 <div class="detail-actions">
                     <div class="qty-selector" style="height:48px;">
-                        <button class="qty-btn minus" data-id="${p.id}">-</button>
+                        <button type="button" class="qty-btn minus" data-id="${p.id}">-</button>
                         <input type="number" value="${qty || 1}" class="qty-input" id="qty-${p.id}" style="width:60px;">
-                        <button class="qty-btn plus" data-id="${p.id}">+</button>
+                        <button type="button" class="qty-btn plus" data-id="${p.id}">+</button>
                     </div>
-                    <button class="add-btn btn-primary" data-id="${p.id}" style="height:48px; flex: 1;">${qty ? 'Actualizar Carrito' : 'Agregar al Carrito'}</button>
+                    <button type="button" class="add-btn btn-primary" data-id="${p.id}" style="height:48px; flex: 1;">${qty ? 'Actualizar Carrito' : 'Agregar al Carrito'}</button>
                 </div>
             </div>
         </div>
-
-        <div class="related-sections-container" style="margin-top: 50px; border-top: 1px solid var(--medium-gray); padding-top: 30px;">
-            ${relatedColors.length > 0 ? `
-                <div class="related-section" style="margin-bottom: 40px;">
-                    <h4 style="margin-bottom: 20px; font-size: 1.5rem;">Colores Disponibles</h4>
-                    <div class="related-grid" style="display: flex; flex-wrap: wrap; gap: 16px;">
-                        ${relatedColors.map(rc => `
-                            <a href="${fixPath('producto.html')}?id=${rc.id}" class="mini-card" style="text-decoration: none; color: inherit; width: calc(12.5% - 16px); min-width: 110px; background: var(--white); border: 1px solid var(--medium-gray); border-radius: 12px; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: block;">
-                                <div class="mini-card-img" style="height: 90px; background: var(--light-gray); display: flex; align-items: center; justify-content: center; padding: 10px;">
-                                    <img src="${fixPath(rc.image2 || rc.image)}" style="max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease;">
-                                </div>
-                                <div class="mini-card-info" style="padding: 10px; text-align: center;">
-                                    <div style="font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${rc.colorCode} ${rc.colores[0]}</div>
-                                    <div style="font-size: 0.75rem; color: var(--primary); font-weight: 700; margin-top: 4px;">S/ ${rc.price.toFixed(2)}</div>
-                                </div>
-                            </a>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-
-            ${relatedSizes.length > 0 ? `
-                <div class="related-section">
-                    <h4 style="margin-bottom: 20px; font-size: 1.5rem;">Otros Tamaños</h4>
-                    <div class="related-grid" style="display: flex; flex-wrap: wrap; gap: 16px;">
-                        ${relatedSizes.map(rs => `
-                            <a href="${fixPath('producto.html')}?id=${rs.id}" class="mini-card" style="text-decoration: none; color: inherit; width: calc(14.28% - 16px); min-width: 130px; background: var(--white); border: 1px solid var(--medium-gray); border-radius: 12px; overflow: hidden; transition: var(--transition); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                                <div class="mini-card-img" style="height: 90px; background: var(--light-gray); display: flex; align-items: center; justify-content: center; padding: 10px;">
-                                    <img src="${fixPath(rs.image)}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                                </div>
-                                <div class="mini-card-info" style="padding: 10px; text-align: center;">
-                                    <div style="font-size: 0.8rem; font-weight: 600;">${rs.dimensiones}</div>
-                                    <div style="font-size: 0.75rem; color: var(--secondary-text); margin-top: 4px;">${rs.colores[0]}</div>
-                                </div>
-                            </a>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-        </div>`;
+`;
 }
 
 function setupEventListeners() {
@@ -538,7 +636,8 @@ function setupEventListeners() {
             const isStorePage = !!document.getElementById('productGrid');
             
             if (isStorePage) {
-                const checkbox = document.querySelector(`input[data-type="campaigns"][data-value="${promoName}"]`);
+                const checkbox = [...document.querySelectorAll('input[data-type="campaigns"]')]
+                    .find(el => el.dataset.value === promoName);
                 if (checkbox) {
                     document.querySelectorAll('input[data-type="campaigns"]').forEach(cb => cb.checked = false);
                     checkbox.checked = true;
@@ -632,7 +731,12 @@ function setupEventListeners() {
                 // Si ya tiene una cantidad real → sumar un paquete completo sobre lo actual.
                 const newVal = (currentQtyInInput <= 1) ? packSize : (currentQtyInInput + packSize);
                 if (input) input.value = newVal;
-                Store.updateQuantity(id, newVal);
+                
+                // Si está dentro del carrito, sí lo agregamos/actualizamos de inmediato.
+                // Si está en la grilla, no lo agrega hasta hacer clic en el botón de carrito negro.
+                if (isInsideCart) {
+                    Store.updateQuantity(id, newVal);
+                }
             }
             else {
                 // Botón genérico (ej. en detalle de producto)
@@ -732,15 +836,15 @@ function setupEventListeners() {
         });
     }
 
-    // Sidebar Filters (Categories, Laboratories, Campaigns)
+    // Sidebar Filters (categories, laboratories, colors, sizes, campaigns)
     const sidebar = document.getElementById('sidebar');
     if (sidebar) {
         sidebar.addEventListener('change', (e) => {
             const cb = e.target;
             if (cb.type !== 'checkbox') return;
-            const type = cb.dataset.type;   // 'categories' | 'laboratories' | 'campaigns'
+            const type = cb.dataset.type;
             const value = cb.dataset.value;
-            if (!type || !value) return;
+            if (!type || !value || !Array.isArray(activeFilters[type])) return;
 
             if (cb.checked) {
                 if (!activeFilters[type].includes(value)) activeFilters[type].push(value);
@@ -819,6 +923,17 @@ function setupEventListeners() {
             if (e.target === confirmModal) confirmModal.classList.remove('active');
         });
     }
+
+    // Checkout Button Navigation Handler
+    const chBtn = document.getElementById('checkoutBtn');
+    if (chBtn) {
+        chBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!chBtn.classList.contains('disabled')) {
+                window.location.href = fixPath('checkout.html');
+            }
+        });
+    }
 }
 
 function updateCartCount() {
@@ -877,21 +992,23 @@ function renderCart() {
                 </div>
                 <div class="cart-item-qty-container">
                     <div class="qty-selector" data-id="${i.id}">
-                        <button class="qty-btn minus" data-tooltip="Disminuir cantidad">
+                        <button type="button" class="qty-btn minus" data-tooltip="Disminuir cantidad">
                             ${i.quantity === 1 
                                 ? `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>` 
                                 : '-'}
                         </button>
                         <input type="number" value="${i.quantity}" class="qty-input">
-                        <button class="qty-btn plus" data-tooltip="Aumentar cantidad">+</button>
+                        <button type="button" class="qty-btn plus" data-tooltip="Aumentar cantidad">+</button>
                     </div>
-                    <button class="add-btn pack-add-btn inside-cart" data-id="${i.id}" data-tooltip="Agregar 1 Paquete (+${i.pack || 12})" style="width: 40px; height: 40px; padding: 0; border-radius: var(--radius-button); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; border: none; background: #ffd64a; color: #222;">
+                    <button type="button" class="add-btn pack-add-btn inside-cart" data-id="${i.id}" data-tooltip="Agregar 1 Paquete (+${i.pack || 12})" style="width: 40px; height: 40px; padding: 0; border-radius: var(--radius-button); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; border: none; background: #ffd64a; color: #222;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
                     </button>
                 </div>
             </div>
             <div class="cart-item-right">
-                <div class="cart-item-price">S/ ${formatNumber(i.price, 2)} c/u</div>
+                <div class="cart-item-price">
+                    S/ ${formatNumber(i.price, 2)} c/u
+                </div>
                 <div>
                     <div class="cart-item-units">${formatNumber(i.quantity)} Unid.</div>
                     <div class="cart-item-total-price">S/ ${formatNumber(i.price * i.quantity, 2)}</div>
@@ -900,11 +1017,25 @@ function renderCart() {
         </div>
     `).join('');
 
-    const subtotal = Store.cart.reduce((a, i) => a + (i.price * i.quantity), 0);
+    const originalSubtotal = Store.cart.reduce((a, i) => a + ((i.originalPrice || i.price) * i.quantity), 0);
+    const discount = Store.cart.reduce((a, i) => a + (i.originalPrice ? (i.originalPrice - i.price) * i.quantity : 0), 0);
+    const subtotal = originalSubtotal - discount; // net subtotal
     const tax = subtotal * 0.18;
     const total = subtotal + tax;
 
-    if (subtotalText) subtotalText.textContent = `S/ ${formatNumber(subtotal, 2)}`;
+    if (subtotalText) subtotalText.textContent = `S/ ${formatNumber(originalSubtotal, 2)}`;
+    
+    const discountRow = document.getElementById('cartDiscountRow');
+    const discountText = document.getElementById('cartDiscountText');
+    if (discountRow && discountText) {
+        if (discount > 0) {
+            discountRow.style.display = 'flex';
+            discountText.textContent = `-S/ ${formatNumber(discount, 2)}`;
+        } else {
+            discountRow.style.display = 'none';
+        }
+    }
+
     if (taxText) taxText.textContent = `S/ ${formatNumber(tax, 2)}`;
     if (totalText) totalText.textContent = `S/ ${formatNumber(total, 2)}`;
 

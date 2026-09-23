@@ -1,4 +1,4 @@
-const categories = ["Touch", "Belleza"];
+const categories = ["Touch", "Belleza", "Premium", "Cotton Plus"];
 const laboratories = ["San Jacinto"];
 const colors = ["Blanco", "Negro", "Azul", "Plomo", "Crema", "Azul Colombia", "Beige", "Celeste Fox", "Verde Laurel", "Acero", "Lila", "Fresa", "Tierra", "Rosa Fuerte", "Cocona", "Fucsia", "Guinda TX", "Purpura", "Verde Oscuro"];
 
@@ -42,11 +42,11 @@ const baseProducts = [
     { articulo: "7042", name: "Toalla Cotton Touch 0.60x0.40", category: "Touch", laboratory: "San Jacinto", price: 5.21, costo: 3.65, dim: "0.60 x 0.40 m", pack: "25" },
     { articulo: "7043", name: "Toalla Cotton Touch 1.20x0.60", category: "Touch", laboratory: "San Jacinto", price: 13.03, costo: 9.12, dim: "1.20 x 0.60 m", pack: "12" },
     { articulo: "7044", name: "Toalla Cotton Touch 1.60x0.75", category: "Touch", laboratory: "San Jacinto", price: 21.02, costo: 14.71, dim: "1.60 x 0.75 m", pack: "12" },
-    { articulo: "7056", name: "Toalla Cotton Pluss 1.45x0.75", category: "Touch", laboratory: "San Jacinto", price: 23.54, costo: 16.48, dim: "1.45 x 0.75 m", pack: "12" },
-    { articulo: "7057", name: "Toalla Cotton Pluss 0.80x0.40", category: "Belleza", laboratory: "San Jacinto", price: 8.03, costo: 5.62, dim: "0.80 x 0.40 m", pack: "20" },
-    { articulo: "7058", name: "Toalla Cotton Pluss 0.30x0.30", category: "Belleza", laboratory: "San Jacinto", price: 5.89, costo: 4.12, dim: "0.30 x 0.30 m", pack: "25" },
-    { articulo: "7059", name: "Toalla Cotton Pluss 1.80x0.90", category: "Belleza", laboratory: "San Jacinto", price: 31.11, costo: 21.78, dim: "1.80 x 0.90 m", pack: "12" },
-    { articulo: "7066", name: "Toalla Premium 1.45x0.75", category: "Touch", laboratory: "San Jacinto", price: 29.43, costo: 20.60, dim: "1.45 x 0.75 m", pack: "12" }
+    { articulo: "7056", name: "Toalla Cotton Plus 1.45x0.75", category: "Cotton Plus", laboratory: "San Jacinto", price: 23.54, costo: 16.48, dim: "1.45 x 0.75 m", pack: "12" },
+    { articulo: "7057", name: "Toalla Cotton Plus 0.80x0.40", category: "Cotton Plus", laboratory: "San Jacinto", price: 8.03, costo: 5.62, dim: "0.80 x 0.40 m", pack: "20" },
+    { articulo: "7058", name: "Toalla Cotton Plus 0.30x0.30", category: "Cotton Plus", laboratory: "San Jacinto", price: 5.89, costo: 4.12, dim: "0.30 x 0.30 m", pack: "25" },
+    { articulo: "7059", name: "Toalla Cotton Plus 1.80x0.90", category: "Cotton Plus", laboratory: "San Jacinto", price: 31.11, costo: 21.78, dim: "1.80 x 0.90 m", pack: "12" },
+    { articulo: "7066", name: "Toalla Premium 1.45x0.75", category: "Premium", laboratory: "San Jacinto", price: 29.43, costo: 20.60, dim: "1.45 x 0.75 m", pack: "12" }
 ];
 
 const colorImages = {
@@ -97,6 +97,30 @@ let products = [];
 let idCounter = 1;
 
 baseProducts.forEach(base => {
+    // Assign offers deterministically based on article number to keep prices stable on reload
+    let offers = [];
+    if (base.articulo === "7015" || base.articulo === "7059") {
+        offers = ["Día de la Madre"];
+    } else if (base.articulo === "7041" || base.articulo === "7057") {
+        offers = ["25% de descuento"];
+    } else if (base.articulo === "7056" || base.articulo === "7066") {
+        offers = ["Nuevo"];
+    }
+
+    let originalPrice = null;
+    let finalPrice = base.price;
+    let discountPercent = 0;
+
+    if (offers.includes("Día de la Madre")) {
+        originalPrice = base.price;
+        finalPrice = parseFloat((base.price * 0.5).toFixed(2));
+        discountPercent = 50;
+    } else if (offers.includes("25% de descuento")) {
+        originalPrice = base.price;
+        finalPrice = parseFloat((base.price * 0.75).toFixed(2));
+        discountPercent = 25;
+    }
+
     colors.forEach(color => {
         const code = colorCodes[color] || "000000";
         const packSize = parseInt(base.pack) || 12;
@@ -108,7 +132,9 @@ baseProducts.forEach(base => {
             name: `${base.name} - ${color}`,
             category: base.category,
             laboratory: base.laboratory,
-            price: base.price,
+            price: finalPrice,
+            originalPrice: originalPrice,
+            discount: discountPercent,
             costo_unitario: base.costo,
             articulo: base.articulo,
             dimensiones: base.dim,
@@ -119,8 +145,8 @@ baseProducts.forEach(base => {
             stock_paquetes: stockPacks,
             image: colorImages[color] || "./assets/product.png",
             image2: colorImagesPeque[color] || "./assets/product.png",
-            isFavorite: Math.random() > 0.9,
-            offers: Math.random() > 0.8 ? ["Día de la Madre"] : (Math.random() > 0.9 ? ["25% de descuento"] : [])
+            isFavorite: base.articulo === "7015" && color === "Negro", // Stable initial favorite
+            offers: offers
         });
     });
 });

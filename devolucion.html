@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de devolución - iSAGI Shop and bulk</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .return-page,
+        .return-page h2,
+        .return-page h3 {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .return-page {
+            padding: 40px 0 80px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--secondary-text);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .return-card {
+            background: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--radius-card);
+            padding: 32px;
+            max-width: 720px;
+        }
+
+        .return-code {
+            display: inline-block;
+            background: var(--light-gray);
+            border-radius: var(--radius-full);
+            padding: 6px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .timeline {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .timeline-step {
+            display: grid;
+            grid-template-columns: 28px 1fr;
+            gap: 16px;
+        }
+
+        .timeline-rail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid var(--medium-gray);
+            background: var(--white);
+            flex-shrink: 0;
+        }
+
+        .timeline-step.done .timeline-dot {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .timeline-step.current .timeline-dot {
+            background: #8A5A12;
+            border-color: #F6E7A8;
+            box-shadow: 0 0 0 4px #FFF4D4;
+        }
+
+        .timeline-line {
+            width: 2px;
+            flex: 1;
+            min-height: 36px;
+            background: var(--medium-gray);
+        }
+
+        .timeline-step.done .timeline-line {
+            background: var(--primary);
+        }
+
+        .timeline-body {
+            padding-bottom: 28px;
+        }
+
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .timeline-copy {
+            font-size: 14px;
+            color: var(--secondary-text);
+            margin-top: 4px;
+            letter-spacing: 0.02em;
+        }
+    </style>
+</head>
+<body>
+    <div id="mainHeader"></div>
+    <div class="container return-page">
+        <a class="back-link" href="pedidos.html">← Volver a mis pedidos</a>
+        <div class="return-card" id="returnCard">
+            <p>Cargando estado de devolución…</p>
+        </div>
+    </div>
+    <script type="module" src="app.js"></script>
+    <script>
+        const STEPS = [
+            { key: 'recibida', title: 'Solicitud recibida', copy: 'Registramos tu pedido de devolución.' },
+            { key: 'revision', title: 'En revisión', copy: 'El equipo valida productos y motivo del retorno.' },
+            { key: 'recojo', title: 'Recojo o recepción', copy: 'Esperamos el producto para completar la devolución.' },
+            { key: 'reembolso', title: 'Reembolso en proceso', copy: 'Cuando se apruebe, el monto vuelve por el mismo medio de pago.' }
+        ];
+
+        function getOrders() {
+            try {
+                return JSON.parse(localStorage.getItem('pharmaOrders') || '[]') || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        const id = new URLSearchParams(window.location.search).get('id');
+        const order = getOrders().find(function (o) { return String(o.id) === String(id); });
+        const card = document.getElementById('returnCard');
+
+        if (!order) {
+            card.innerHTML = '<h2>No encontramos esa devolución.</h2><p style="margin-top:8px;color:var(--secondary-text);">Vuelve a pedidos e inténtalo otra vez.</p>';
+        } else {
+            const started = order.returnRequestedAt ? new Date(order.returnRequestedAt) : new Date();
+            const hours = (Date.now() - started.getTime()) / 36e5;
+            let current = 1;
+            if (hours > 12) current = 2;
+            if (hours > 48) current = 3;
+            if (hours > 96) current = 4;
+
+            const stepsHTML = STEPS.map(function (step, i) {
+                const index = i + 1;
+                const state = index < current ? 'done' : (index === current ? 'current' : '');
+                const line = i === STEPS.length - 1 ? '' : '<div class="timeline-line"></div>';
+                return '<div class="timeline-step ' + state + '">' +
+                    '<div class="timeline-rail"><div class="timeline-dot"></div>' + line + '</div>' +
+                    '<div class="timeline-body">' +
+                        '<div class="timeline-title">' + step.title + '</div>' +
+                        '<div class="timeline-copy">' + step.copy + '</div>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            card.innerHTML =
+                '<span class="return-code">' + (order.series || ('TSJ-' + order.id)) + '</span>' +
+                '<h2 style="font-size: 28px; margin-bottom: 8px;">Estado de devolución</h2>' +
+                '<p style="color: var(--secondary-text); letter-spacing: 0.03em;">La devolución está en proceso. Este tablero se actualiza según avance el caso.</p>' +
+                '<div class="timeline">' + stepsHTML + '</div>';
+        }
+    </script>
+</body>
+</html>

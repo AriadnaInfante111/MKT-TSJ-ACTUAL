@@ -33,6 +33,94 @@
             font-size: 0.8rem;
             color: var(--secondary-text);
         }
+        .sg-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            align-items: flex-start;
+        }
+        .sg-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .sg-preview-box {
+            background: var(--light-gray);
+            border: 1px dashed var(--medium-gray);
+            border-radius: var(--radius-card);
+            padding: 24px;
+        }
+        .sg-swatch-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .sg-color-chip {
+            text-align: center;
+            width: 100px;
+        }
+        .sg-color-chip .chip {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--medium-gray);
+        }
+        .sg-narrow {
+            max-width: 320px;
+        }
+        .sg-list-demo .product-grid.list {
+            width: 100%;
+        }
+        .sg-list-demo .product-card {
+            max-width: none;
+        }
+        .sg-filter-demo {
+            max-width: 260px;
+            background: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--radius-card);
+            padding: 20px;
+        }
+        .sg-cart-demo {
+            max-width: 380px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--radius-card);
+            overflow: hidden;
+            background: var(--white);
+        }
+        .sg-cart-demo .cart-header,
+        .sg-cart-demo .cart-footer {
+            position: static;
+        }
+        .sg-cart-demo .cart-body {
+            max-height: 220px;
+            overflow: auto;
+        }
+        .sg-modal-demo {
+            position: relative;
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-card);
+            padding: 30px;
+        }
+        .sg-modal-demo .modal-content {
+            position: static;
+            transform: none;
+            opacity: 1;
+            visibility: visible;
+            animation: none;
+        }
+        .sg-badge-wrap {
+            position: relative;
+            display: inline-flex;
+            padding: 12px;
+            background: var(--light-gray);
+            border-radius: var(--radius-button);
+        }
     </style>
 </head>
 <body>
@@ -47,7 +135,7 @@
     </header>
 
     <div class="container">
-        <!-- Typography Section -->
+        <!-- Typography -->
         <section class="component-section">
             <span class="component-label">Tipografía y Escala</span>
             <div class="gallery">
@@ -73,7 +161,7 @@
                 </div>
                 <div class="type-item">
                     <span class="type-meta">H6 - Inter - 16px</span>
-                    <h6>Paracetamol 500mg Tabletas</h6>
+                    <h6>Toalla Cotton Plus 0.80x0.40 - Blanco</h6>
                 </div>
                 <div class="type-item">
                     <span class="type-meta">Body - Inter - 16px</span>
@@ -81,55 +169,67 @@
                 </div>
                 <div class="type-item">
                     <span class="type-meta">Label - Inter - 14px</span>
-                    <span class="label-small">Vence: 12/2026</span>
+                    <span class="label-small">Pack: 20 | Color: 982004</span>
                 </div>
                 <div class="type-item">
                     <span class="type-meta">X-Small - Inter - 12px</span>
-                    <span class="label-extra-small">Lote: PH99201</span>
+                    <span class="label-extra-small">Artículo: 7057</span>
                 </div>
             </div>
         </section>
 
-        <!-- Colors Section -->
+        <!-- Colors -->
         <section class="component-section">
             <span class="component-label">Paleta de Colores</span>
-            <div style="display: flex; gap: 20px;">
-                <div style="text-align: center;">
-                    <div style="width: 100px; height: 100px; background: var(--primary); border-radius: 12px; margin-bottom: 10px;"></div>
-                    <span class="label-small">Apollo Yellow<br>#FFC635</span>
+            <div class="sg-swatch-grid">
+                <div class="sg-color-chip">
+                    <div class="chip" style="background: var(--primary);"></div>
+                    <span class="label-small">Primary<br>#F9C842</span>
                 </div>
-                <div style="text-align: center;">
-                    <div style="width: 100px; height: 100px; background: var(--primary-text); border-radius: 12px; margin-bottom: 10px;"></div>
+                <div class="sg-color-chip">
+                    <div class="chip" style="background: var(--primary-text);"></div>
                     <span class="label-small">Primary Text<br>#333333</span>
                 </div>
-                <div style="text-align: center;">
-                    <div style="width: 100px; height: 100px; background: var(--secondary-text); border-radius: 12px; margin-bottom: 10px;"></div>
+                <div class="sg-color-chip">
+                    <div class="chip" style="background: var(--secondary-text);"></div>
                     <span class="label-small">Secondary<br>#666666</span>
                 </div>
-                <div style="text-align: center;">
-                    <div style="width: 100px; height: 100px; background: var(--medium-gray); border-radius: 12px; margin-bottom: 10px;"></div>
+                <div class="sg-color-chip">
+                    <div class="chip" style="background: var(--light-gray);"></div>
+                    <span class="label-small">Light Gray<br>#F5F5F5</span>
+                </div>
+                <div class="sg-color-chip">
+                    <div class="chip" style="background: var(--medium-gray);"></div>
                     <span class="label-small">Border<br>#E0E0E0</span>
+                </div>
+                <div class="sg-color-chip">
+                    <div class="chip" style="background: var(--heart-red);"></div>
+                    <span class="label-small">Heart Red<br>#FF4D4F</span>
+                </div>
+                <div class="sg-color-chip">
+                    <div class="chip" style="background: var(--white);"></div>
+                    <span class="label-small">White<br>#FFFFFF</span>
                 </div>
             </div>
         </section>
 
-        <!-- Components Section -->
+        <!-- Buttons -->
         <section class="component-section">
             <span class="component-label">Botones e Interacción</span>
-            <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
-                <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div class="sg-row">
+                <div class="sg-col">
                     <span class="label-extra-small">SOLID</span>
                     <button class="add-btn btn-primary">Primario (Apollo)</button>
                     <button class="add-btn">Secundario (80% Black)</button>
                 </div>
-                
-                <div style="display: flex; flex-direction: column; gap: 10px;">
+
+                <div class="sg-col">
                     <span class="label-extra-small">OUTLINED</span>
                     <button class="add-btn btn-outline-primary">Outline Primario</button>
                     <button class="add-btn btn-outline-secondary">Outline Secundario</button>
                 </div>
 
-                <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="sg-col">
                     <span class="label-extra-small">QUANTITY & ICONS</span>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <div class="qty-selector">
@@ -137,62 +237,255 @@
                             <input type="number" value="1" class="qty-input">
                             <button class="qty-btn">+</button>
                         </div>
-                        <button class="icon-button">
+                        <button class="icon-button" data-tooltip="Favoritos">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
                         </button>
                     </div>
                 </div>
-            </div>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
+
+                <div class="sg-col">
                     <span class="label-extra-small">DISABLED STATE</span>
                     <button class="add-btn disabled">Finalizar Compra (Disabled)</button>
                 </div>
+
+                <div class="sg-col">
+                    <span class="label-extra-small">CLEAR CART ICON</span>
+                    <button class="clear-cart-btn-icon" data-tooltip="Vaciar carrito">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
+                    </button>
+                </div>
             </div>
         </section>
-        
-        <!-- Banners Section -->
+
+        <!-- Badge & Tooltip -->
+        <section class="component-section">
+            <span class="component-label">Badge y Tooltip</span>
+            <div class="sg-row" style="align-items: center;">
+                <div class="sg-col">
+                    <span class="label-extra-small">CART BADGE</span>
+                    <div class="sg-badge-wrap">
+                        <button class="icon-button" data-tooltip="Ver carrito">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                            <span class="badge">3</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="sg-col">
+                    <span class="label-extra-small">TOOLTIP (hover)</span>
+                    <button class="view-btn active" data-tooltip="Lista">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" x2="21" y1="6" y2="6" />
+                            <line x1="3" x2="21" y1="12" y2="12" />
+                            <line x1="3" x2="21" y1="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Bar -->
+        <section class="component-section">
+            <span class="component-label">Barra de Búsqueda</span>
+            <div class="search-bar" style="max-width: 520px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" placeholder="Busca por producto, fabricante o línea..." value="Cotton Plus">
+            </div>
+        </section>
+
+        <!-- View Controls & Toolbar -->
+        <section class="component-section">
+            <span class="component-label">Toolbar y Controles de Vista</span>
+            <div class="toolbar" style="border: 1px solid var(--medium-gray); border-radius: var(--radius-card); padding: 16px 20px;">
+                <h5 id="productCount">Mostrando 24 productos</h5>
+                <button class="filter-toggle-btn" style="display: flex; align-items: center; gap: 8px; background: var(--light-gray); border: 1px solid var(--medium-gray); padding: 8px 16px; border-radius: var(--radius-button); font-weight: 600; font-family: inherit; cursor: pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    Filtrar
+                </button>
+                <div class="view-controls">
+                    <button class="view-btn" data-tooltip="4 Columnas">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                    </button>
+                    <button class="view-btn active" data-tooltip="3 Columnas">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v18H3zM14 3h7v7h-7zM14 14h7v7h-7z"/></svg>
+                    </button>
+                    <button class="view-btn" data-tooltip="Lista">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="component-section">
+            <span class="component-label">Filtros Laterales</span>
+            <div class="sg-row">
+                <div class="sg-filter-demo">
+                    <div class="filter-section" style="margin-bottom: 0;">
+                        <h5>Líneas</h5>
+                        <ul class="filter-list">
+                            <li class="filter-item"><input type="checkbox" id="sg-touch"><label for="sg-touch">Touch</label></li>
+                            <li class="filter-item"><input type="checkbox" id="sg-belleza"><label for="sg-belleza">Belleza</label></li>
+                            <li class="filter-item"><input type="checkbox" id="sg-premium" checked><label for="sg-premium">Premium</label></li>
+                            <li class="filter-item"><input type="checkbox" id="sg-cotton" checked><label for="sg-cotton">Cotton Plus</label></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="sg-filter-demo">
+                    <div class="filter-section" style="margin-bottom: 0;">
+                        <h5>Ofertas</h5>
+                        <ul class="filter-list">
+                            <li class="filter-item"><input type="checkbox" id="sg-madre"><label for="sg-madre">Día de la Madre</label></li>
+                            <li class="filter-item"><input type="checkbox" id="sg-25" checked><label for="sg-25">25% de descuento</label></li>
+                            <li class="filter-item"><input type="checkbox" id="sg-nuevo"><label for="sg-nuevo">Nuevo</label></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="sg-filter-demo">
+                    <div class="filter-section" style="margin-bottom: 0;">
+                        <h5>Colores / Fabricantes</h5>
+                        <ul class="filter-list">
+                            <li class="filter-item"><input type="checkbox" id="sg-blanco" checked><label for="sg-blanco">Blanco</label></li>
+                            <li class="filter-item"><input type="checkbox" id="sg-negro"><label for="sg-negro">Negro</label></li>
+                            <li class="filter-item"><input type="checkbox" id="sg-lab" checked><label for="sg-lab">San Jacinto</label></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Banners -->
         <section class="component-section">
             <span class="component-label">Banners e Información</span>
-            <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 28px;">
                 <span class="label-extra-small">TOP OFFER BANNER</span>
                 <div class="offer-banner" style="margin-top: 10px;">
                     <div class="offer-banner-content">
                         <div class="offer-banner-left">
-                            <span class="offer-banner-title">CyberWow</span>
-                            <span class="offer-banner-desc">¡Hasta 50% de descuento! Solo por hoy.</span>
+                            <span class="offer-banner-title">Día de la Madre</span>
+                            <span class="offer-banner-desc">¡Hasta 50% de descuento! El regalo perfecto para ella.</span>
                         </div>
                         <button class="offer-banner-btn">VER PRODUCTOS</button>
                     </div>
                 </div>
             </div>
+            <div>
+                <span class="label-extra-small">CAMPAIGN HEADER</span>
+                <div class="campaign-header-display" style="display: flex; margin-top: 10px;">
+                    <div class="campaign-header-top">
+                        <div class="campaign-header-title"><span>25% de descuento</span></div>
+                        <div class="mega-promo-date" style="font-size: 0.9rem;">Válido del 01/04/2026 al 31/12/2026</div>
+                    </div>
+                    <div class="campaign-header-desc">Descuento directo en marcas seleccionadas.</div>
+                    <div class="campaign-header-footer">
+                        <span class="label-small"><strong>38</strong> productos encontrados en esta campaña</span>
+                    </div>
+                </div>
+            </div>
         </section>
 
+        <!-- Product Cards -->
         <section class="component-section">
-            <span class="component-label">Cards & Promos</span>
-            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px;">
-                <div>
-                    <span class="label-extra-small">PRODUCT CARD PREVIEW</span>
-                    <article class="product-card">
-                        <div class="card-image-wrapper">
-                            <img src="./assets/product.png" alt="Preview">
-                            <button class="favorite-btn active">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-                            </button>
-                            <span class="card-tag">Día de la Madre</span>
+            <span class="component-label">Product Card (Grid)</span>
+            <div style="max-width: 320px;">
+                <article class="product-card">
+                    <div class="card-image-wrapper">
+                        <img src="./assets/product.png" alt="Preview">
+                        <button class="favorite-btn active">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                        </button>
+                        <span class="card-tag grid-only-tag">25% de descuento</span>
+                    </div>
+                    <div class="card-content-wrapper">
+                        <span class="card-articulo">7057</span>
+                        <a href="#" class="card-name-link">
+                            <h6 class="card-name">Toalla Cotton Plus 0.80x0.40 - Blanco</h6>
+                        </a>
+                        <span class="card-brand">San Jacinto</span>
+                        <div class="card-price-group has-discount">
+                            <div class="card-price">S/ 6.02</div>
+                            <div class="original-price">S/ 8.03</div>
                         </div>
-                        <div class="card-info">
-                             <span class="card-articulo">7015</span>
-                             <a href="#" class="card-name-link">
-                                <h6 class="card-name">Toalla Belleza 150 × 75 - Blanco</h6>
-                                <span class="card-brand">San Jacinto</span>
-                             </a>
-                             <div class="card-price">S/ 15.97</div>
-                             <div class="card-meta">Pack: 12 | Color: 982004</div>
+                        <div class="card-meta">Pack: 20 | Color: 982004</div>
+                        <div class="card-actions">
+                            <div class="qty-selector">
+                                <button type="button" class="qty-btn">-</button>
+                                <input type="number" value="1" class="qty-input">
+                                <button type="button" class="qty-btn">+</button>
+                            </div>
+                            <div class="card-btn-group">
+                                <button type="button" class="add-btn pack-add-btn" data-tooltip="Agregar 1 Paquete">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+                                </button>
+                                <button type="button" class="add-btn cart-add-btn" data-tooltip="Agregar cantidad actual">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                                </button>
+                            </div>
                         </div>
-                    </article>
-                </div>
+                    </div>
+                </article>
+            </div>
+        </section>
 
-                <div>
+        <!-- List Card -->
+        <section class="component-section sg-list-demo">
+            <span class="component-label">Product Card (Lista)</span>
+            <div class="product-grid list">
+                <article class="product-card">
+                    <div class="card-image-wrapper">
+                        <img src="./assets/product.png" alt="Preview">
+                    </div>
+                    <div class="card-content-wrapper">
+                        <span class="card-articulo">7057</span>
+                        <span class="card-tag inline-tag">25% de descuento</span>
+                        <a href="#" class="card-name-link">
+                            <h6 class="card-name">Toalla Cotton Plus 0.80x0.40 - Blanco</h6>
+                        </a>
+                        <span class="card-brand">San Jacinto</span>
+                        <div class="card-price-group has-discount">
+                            <div class="card-price">S/ 6.02</div>
+                            <div class="original-price">S/ 8.03</div>
+                        </div>
+                        <div class="card-meta">Pack: 20 | Color: 982004</div>
+                        <div class="card-actions">
+                            <div class="qty-selector">
+                                <button type="button" class="qty-btn">-</button>
+                                <input type="number" value="1" class="qty-input">
+                                <button type="button" class="qty-btn">+</button>
+                            </div>
+                            <div class="card-btn-group">
+                                <button type="button" class="add-btn pack-add-btn" data-tooltip="Agregar 1 Paquete">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 16h6"/><path d="M19 13v6"/><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l2-1.14"/><path d="m7.5 4.27 9 5.15"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+                                </button>
+                                <button type="button" class="add-btn cart-add-btn" data-tooltip="Agregar cantidad actual">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Swatches & Tags -->
+        <section class="component-section">
+            <span class="component-label">Tags, Swatches y Promo Card</span>
+            <div class="sg-row">
+                <div class="sg-col">
+                    <span class="label-extra-small">CARD TAG</span>
+                    <span class="card-tag" style="position: static; display: inline-block;">Día de la Madre -50%</span>
+                    <span class="card-tag inline-tag" style="position: static; display: inline-block; margin-top: 8px;">25% de descuento</span>
+                </div>
+                <div class="sg-col">
+                    <span class="label-extra-small">COLOR SWATCHES</span>
+                    <div class="card-swatches" style="display: flex;">
+                        <span class="swatch active" style="background:#ffffff;"></span>
+                        <span class="swatch" style="background:#111111;"></span>
+                        <span class="swatch" style="background:#2f5ea8;"></span>
+                        <span class="swatch" style="background:#8a8a8a;"></span>
+                        <span class="swatch" style="background:#c9a66b;"></span>
+                    </div>
+                </div>
+                <div class="sg-col" style="flex: 1; min-width: 260px;">
                     <span class="label-extra-small">MEGA MENU PROMO CARD</span>
                     <div class="mega-promo-card" style="opacity: 1; visibility: visible; border: 1px solid var(--medium-gray);">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -203,6 +496,79 @@
                         <div class="mega-promo-date">Válido del 20 al 25 de abril</div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Cart Drawer Pieces -->
+        <section class="component-section">
+            <span class="component-label">Carrito (Drawer)</span>
+            <div class="sg-cart-demo">
+                <div class="cart-header">
+                    <h3>Tu Carrito</h3>
+                    <button class="icon-button" data-tooltip="Cerrar carrito">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="cart-body">
+                    <div class="cart-item">
+                        <img class="cart-item-img" src="./assets/product.png" alt="">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">Toalla Cotton Plus 0.80x0.40 - Blanco</div>
+                            <div class="cart-item-qty-container">
+                                <div class="qty-selector">
+                                    <button class="qty-btn">-</button>
+                                    <input type="number" value="2" class="qty-input">
+                                    <button class="qty-btn">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cart-item-right">
+                            <div class="cart-item-price">S/ 6.02</div>
+                            <div class="cart-item-units">2 und.</div>
+                            <div class="cart-item-total-price">S/ 12.04</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-footer">
+                    <div class="cart-row"><span>Subtotal:</span><span>S/ 12.04</span></div>
+                    <div class="cart-row"><span>IGV (18%):</span><span>S/ 2.17</span></div>
+                    <div class="cart-total"><span>Total:</span><span>S/ 14.21</span></div>
+                    <div class="cart-footer-actions">
+                        <a href="checkout.html" class="add-btn btn-primary" style="text-decoration: none;">Finalizar compra</a>
+                        <button class="clear-cart-btn-icon" data-tooltip="Vaciar carrito">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal -->
+        <section class="component-section">
+            <span class="component-label">Modal de Confirmación</span>
+            <div class="sg-modal-demo">
+                <div class="modal-content">
+                    <div class="modal-title">¿Vaciar carrito?</div>
+                    <div class="modal-text">Se eliminarán todos los productos de tu lista. Esta acción no se puede deshacer.</div>
+                    <div class="modal-actions">
+                        <button class="modal-btn btn-cancel">Cancelar</button>
+                        <button class="modal-btn btn-confirm">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Account Dropdown -->
+        <section class="component-section">
+            <span class="component-label">Dropdown de Cuenta</span>
+            <div class="account-dropdown active" style="position: relative; opacity: 1; visibility: visible; transform: none; display: block; max-width: 280px;">
+                <div class="dropdown-header">
+                    <strong>Usuario Premium</strong>
+                    <div class="label-extra-small">cliente@isagi.com</div>
+                </div>
+                <a href="pedidos.html">Mis Pedidos</a>
+                <a href="devolucion.html">Devoluciones</a>
+                <a href="login.html">Cerrar sesión</a>
             </div>
         </section>
     </div>
